@@ -377,8 +377,8 @@ document
         const [handle] = await window.showOpenFilePicker({
           types: [
             {
-              description: "YAML Files",
-              accept: { "text/yaml": [".yaml", ".yml"] },
+              description: "JSON Files",
+              accept: { "text/yaml": [".json"] },
             },
           ],
           multiple: false,
@@ -386,11 +386,11 @@ document
         fileHandle = handle;
 
         const file = await fileHandle.getFile();
-        const yamlText = await file.text();
-        console.log("Raw YAML content:", yamlText);
+        const jsonText = await file.text();
+        console.log("Raw YAML content:", jsonText);
 
         try {
-          projectData = jsyaml.load(yamlText);
+          projectData = JSON.parse(jsonText);
 
           // Initialize `projectName` if it's undefined or empty
           if (
@@ -442,8 +442,8 @@ document
             }
           });
         } catch (parseError) {
-          console.error("YAML Parsing Error:", parseError);
-          throw new Error("Failed to parse YAML: " + parseError.message);
+          console.error("JSON Parsing Error:", parseError);
+          throw new Error("Failed to parse JSON: " + parseError.message);
         }
 
         // Initialize `categories` if it's undefined
@@ -494,7 +494,7 @@ document
         renderCategoriesList();
 
         // Save project data and file name to localStorage
-        localStorage.setItem("projectData", JSON.stringify(projectData));
+        localStorage.setItem("projectData", JSON.stringify(projectData, null, 2));
         localStorage.setItem("fileName", fileHandle.name);
 
         // Update status bar with file info
@@ -1714,7 +1714,7 @@ async function saveProjectData(projectData, autosave = false) {
     if (!fileHandle) {
       if (autosave) {
         // Autosave to localStorage when fileHandle is not available
-        localStorage.setItem("projectData", JSON.stringify(projectData));
+        localStorage.setItem("projectData", JSON.stringify(projectData, null, 2));
         statusMessage.textContent = "Autosaved to local storage.";
         setTimeout(() => {
           statusMessage.textContent = "";
@@ -1724,11 +1724,11 @@ async function saveProjectData(projectData, autosave = false) {
         // Prompt the user to pick a file to save
         try {
           fileHandle = await window.showSaveFilePicker({
-            suggestedName: "project.yaml",
+            suggestedName: `${projectData.projectName}.json`,
             types: [
               {
-                description: "YAML Files",
-                accept: { "text/yaml": [".yaml", ".yml"] },
+                description: "JSON Files",
+                accept: { "text/json": [".json"] },
               },
             ],
           });
@@ -1743,7 +1743,7 @@ async function saveProjectData(projectData, autosave = false) {
     if (fileHandle) {
       try {
         const writable = await fileHandle.createWritable();
-        await writable.write(jsyaml.dump(projectData));
+        await writable.write(JSON.stringify(projectData, null, 2));
         await writable.close();
         statusMessage.textContent = autosave
           ? "Autosaved."
@@ -1764,19 +1764,19 @@ async function saveProjectData(projectData, autosave = false) {
     }
 
     // Update localStorage with the latest project data
-    localStorage.setItem("projectData", JSON.stringify(projectData));
+    localStorage.setItem("projectData", JSON.stringify(projectData, null, 2));
     if (fileHandle && fileHandle.name) {
       localStorage.setItem("fileName", fileHandle.name);
     }
   } else {
     // Fallback for browsers that do not support the File System Access API
-    const yamlData = jsyaml.dump(projectData);
-    const blob = new Blob([yamlData], { type: "text/yaml" });
+    const jsonData = JSON.stringify(projectData, null, 2);
+    const blob = new Blob([jsonData], { type: "text/json" });
     if (!autosave) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "project.yaml";
+      link.download = `${projectData.projectName}.json`;
       link.click();
       URL.revokeObjectURL(url);
       statusMessage.textContent =
