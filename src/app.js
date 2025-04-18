@@ -951,9 +951,19 @@ function renderGanttChart(projectData) {
   });
 
   // Iterate over categories as per projectData.categories order
-  for (const category of projectData.categories) {
+  const uncategorizedCategory = {
+    "id": null,
+    "name": "Uncategorized",
+    "color": "#999"
+  }
+  for (const category of [...projectData.categories, uncategorizedCategory]) {
     const categoryId = category.id;
-    const categoryTasks = tasksByCategory[categoryId] || [];
+    let categoryTasks = []
+    if (categoryId === null) {
+      categoryTasks = tasksByCategory["uncategorized"] || [];
+    } else {
+      categoryTasks = tasksByCategory[categoryId] || [];
+    }
 
     if (categoryTasks.length > 0) {
       // Render category heading
@@ -1113,25 +1123,6 @@ function renderGanttChart(projectData) {
         });
       });
     }
-  }
-
-  // Handle 'Uncategorized' tasks after defined categories
-  const uncategorizedTasks = tasksByCategory["uncategorized"] || [];
-  if (uncategorizedTasks.length > 0) {
-    // Render 'Uncategorized' category heading
-    const categoryElement = document.createElement("div");
-    categoryElement.classList.add("category-heading");
-    categoryElement.style.top = `${currentTop}px`;
-    categoryElement.textContent = "Uncategorized";
-    categoryElement.style.borderLeftColor = "#999";
-    fragment.appendChild(categoryElement);
-    currentTop += taskHeight + 10;
-
-    // Render tasks within this category
-    uncategorizedTasks.forEach(({ task, index }) => {
-      // Existing code to render each task (same as in the loop above)
-      // ... (copy the task rendering code from above and paste it here)
-    });
   }
 
   ganttChart.appendChild(fragment);
