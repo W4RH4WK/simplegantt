@@ -1,10 +1,14 @@
-# SimpleGantt
+# SimpleGantt (W4RH4WK Fork)
 
 ![Screenshot 2025-01-09 at 17 58 25](https://github.com/user-attachments/assets/c4f317b8-4b8d-4169-bc89-78fd2d02b5fe)
 
 SimpleGantt is a lightweight project management tool designed for environments where software installation is restricted and cloud web applications are not permitted. It runs entirely in the browser.
 
-[Try it live here](https://aerugo.github.io/simplegantt/simplegantt), data is saved locally.
+## Fork Changes
+
+- Fix and pin choices.js version as it introduced breaking changes
+- Remove YAML reader/writer; just use native JSON
+- Display uncategorized tasks
 
 # Requirements
 SimpleGantt requires a modern web browser with support for HTML5 and JavaScript. It has been tested on the latest versions of Chrome, Firefox, and Edge. It also depends on a number of third-party libraries which are pulled in via CDN. See the `simplegantt.html` file for the list of dependencies.
